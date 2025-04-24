@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ScheduleController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -21,4 +24,13 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
 
-require __DIR__.'/auth.php';
+Route::middleware(['auth'])->group(function () {
+    Route::resource('schedules', ScheduleController::class)->only(['index', 'store']);
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/schedules', [ScheduleController::class, 'index'])->name('schedules.index');
+    Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
+});
+
+require __DIR__ . '/auth.php';
