@@ -25,12 +25,9 @@ Route::get('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
-    Route::resource('schedules', ScheduleController::class)->only(['index', 'store']);
+    Route::resource('schedules', ScheduleController::class)->only(['index', 'store', 'edit', 'update', 'destroy']);
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/schedules', [ScheduleController::class, 'index'])->name('schedules.index');
-    Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
-});
+
 
 require __DIR__ . '/auth.php';
