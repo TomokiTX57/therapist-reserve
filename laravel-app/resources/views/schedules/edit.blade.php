@@ -81,7 +81,7 @@ $header = 'スケジュール編集';
         </div>
 
         <button type="submit" class="btn btn-primary">更新する</button>
-        <a href="{{ route('schedules.index') }}" class="btn btn-secondary">戻る</a>
+        <a href="{{ route('schedules.index') }}" class="btn btn-outline-secondary ms-2">戻る</a>
     </form>
 </div>
 @endsection

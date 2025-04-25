@@ -28,16 +28,36 @@ class ScheduleController extends Controller
 
         $start_time = sprintf('%02d:%02d', $validated['start_hour'], $validated['start_minute']);
         $end_time = sprintf('%02d:%02d', $validated['end_hour'], $validated['end_minute']);
+        $user = auth()->user();
+        $work_date = $validated['work_date'];
 
-        auth()->user()->schedules()->create([
-            'work_date' => $validated['work_date'],
+        // Combine date and time to check against current datetime
+        $startDateTime = strtotime("$work_date $start_time");
+        if ($startDateTime < time()) {
+            return back()->withErrors(['start_time' => '過去の時間は登録できません。'])->withInput();
+        }
+
+        // Check for overlapping schedules
+        $overlap = $user->schedules()
+            ->where('work_date', $work_date)
+            ->where(function ($query) use ($start_time, $end_time) {
+                $query->whereBetween('start_time', [$start_time, $end_time])
+                    ->orWhereBetween('end_time', [$start_time, $end_time])
+                    ->orWhere(function ($query2) use ($start_time, $end_time) {
+                        $query2->where('start_time', '<=', $start_time)
+                            ->where('end_time', '>=', $end_time);
+                    });
+            })
+            ->exists();
+
+        if ($overlap) {
+            return back()->withErrors(['start_time' => 'この時間帯はすでに登録されています。'])->withInput();
+        }
+
+        $user->schedules()->create([
+            'work_date' => $work_date,
             'start_time' => $start_time,
             'end_time' => $end_time,
-        ]);
-
-        $request->merge([
-            'start_time' => $request->input('start_hour') . ':' . $request->input('start_minute'),
-            'end_time' => $request->input('end_hour') . ':' . $request->input('end_minute'),
         ]);
 
         return redirect()->route('schedules.index')->with('success', 'スケジュールを登録しました。');

@@ -69,13 +69,15 @@ $header = '出勤スケジュール登録';
         @foreach($schedules as $schedule)
         <li class="list-group-item">
             {{ $schedule->work_date }}（{{ $schedule->start_time }}〜{{ $schedule->end_time }}）
+            <div class="d-flex gap-2 mt-2">
+                <a href="{{ route('schedules.edit', $schedule->id) }}" class="btn btn-outline-primary btn-sm me-2">編集</a>
+                <form action="{{ route('schedules.destroy', $schedule->id) }}" method="POST" style="display:inline-block;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('本当に削除しますか？')">削除</button>
+                </form>
+            </div>
         </li>
-        <a href="{{ route('schedules.edit', $schedule->id) }}">編集</a>
-        <form action="{{ route('schedules.destroy', $schedule->id) }}" method="POST" style="display:inline-block;">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('本当に削除しますか？')">削除</button>
-        </form>
         @endforeach
     </ul>
 </div>
