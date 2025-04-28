@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Schedule;
+use Illuminate\Support\Facades\Response;
 
 class ScheduleController extends Controller
 {
@@ -58,6 +59,7 @@ class ScheduleController extends Controller
             'work_date' => $work_date,
             'start_time' => $start_time,
             'end_time' => $end_time,
+            'is_public' => $request->has('is_public'),
         ]);
 
         return redirect()->route('schedules.index')->with('success', 'スケジュールを登録しました。');
@@ -81,6 +83,7 @@ class ScheduleController extends Controller
             'start_minute' => 'required',
             'end_hour' => 'required',
             'end_minute' => 'required',
+            'is_public' => 'nullable|boolean'
         ]);
 
         $start_time = sprintf('%02d:%02d:00', $request->start_hour, $request->start_minute);
@@ -95,6 +98,7 @@ class ScheduleController extends Controller
             'work_date' => $request->work_date,
             'start_time' => $start_time,
             'end_time' => $end_time,
+            'is_public' => $request->has('is_public'),
         ]);
 
         return redirect()->route('schedules.index')->with('success', 'スケジュールを更新しました。');
@@ -106,5 +110,50 @@ class ScheduleController extends Controller
         $schedule->delete();
 
         return redirect()->route('schedules.index')->with('success', 'スケジュールを削除しました。');
+    }
+
+    public function export()
+    {
+        $schedules = auth()->user()->schedules()->orderBy('work_date')->get();
+
+        $content = "BEGIN:VCALENDAR\r\n";
+        $content .= "VERSION:2.0\r\n";
+        $content .= "PRODID:-//YourCompany//TherapistSchedule//EN\r\n";
+
+        foreach ($schedules as $schedule) {
+            $start = \Carbon\Carbon::parse($schedule->work_date . ' ' . $schedule->start_time)->format('Ymd\THis\Z');
+            $end = \Carbon\Carbon::parse($schedule->work_date . ' ' . $schedule->end_time)->format('Ymd\THis\Z');
+
+            $content .= "BEGIN:VEVENT\r\n";
+            $content .= "UID:" . uniqid() . "@yourdomain.com\r\n";
+            $content .= "DTSTAMP:" . now()->format('Ymd\THis\Z') . "\r\n";
+            $content .= "DTSTART:" . $start . "\r\n";
+            $content .= "DTEND:" . $end . "\r\n";
+            $content .= "SUMMARY:出勤予定\r\n";
+            $content .= "END:VEVENT\r\n";
+        }
+
+        $content .= "END:VCALENDAR\r\n";
+
+        return Response::make($content, 200, [
+            'Content-Type' => 'text/calendar; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="schedule.ics"',
+        ]);
+    }
+
+    public function showCalendar()
+    {
+        $schedules = auth()->user()->schedules()->orderBy('work_date')->get();
+
+        $events = $schedules->map(function ($schedule) {
+            return [
+                'title' => '出勤',
+                'start' => $schedule->work_date . 'T' . $schedule->start_time,
+                'end' => $schedule->work_date . 'T' . $schedule->end_time,
+                'color' => $schedule->is_public ? '#3788d8' : '#6c757d',
+            ];
+        });
+
+        return view('schedules.show', compact('schedules', 'events'));
     }
 }

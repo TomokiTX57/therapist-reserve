@@ -59,12 +59,20 @@ $header = '出勤スケジュール登録';
             </div>
         </div>
 
+        <div class="mb-3 form-check">
+            <input type="checkbox" name="is_public" id="is_public" class="form-check-input" checked>
+            <label for="is_public" class="form-check-label">公開する</label>
+        </div>
+
         <button type="submit" class="btn btn-primary">登録</button>
     </form>
 
     <hr>
 
     <h3 class="mt-5">登録済みスケジュール</h3>
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ route('schedules.export') }}" class="btn btn-success">スケジュールをエクスポート</a>
+    </div>
     <ul class="list-group mt-3">
         @foreach($schedules as $schedule)
         <li class="list-group-item">

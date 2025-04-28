@@ -80,6 +80,11 @@ $header = 'スケジュール編集';
             </div>
         </div>
 
+        <div class="mb-3 form-check">
+            <input type="checkbox" name="is_public" id="is_public" class="form-check-input" {{ old('is_public', $schedule->is_public) ? 'checked' : '' }}>
+            <label for="is_public" class="form-check-label">公開する</label>
+        </div>
+
         <button type="submit" class="btn btn-primary">更新する</button>
         <a href="{{ route('schedules.index') }}" class="btn btn-outline-secondary ms-2">戻る</a>
     </form>

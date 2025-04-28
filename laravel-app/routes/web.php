@@ -26,6 +26,8 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('schedules', ScheduleController::class)->only(['index', 'store', 'edit', 'update', 'destroy']);
+    Route::get('schedules/export', [ScheduleController::class, 'export'])->name('schedules.export');
+    Route::get('schedules/calendar', [ScheduleController::class, 'showCalendar'])->name('schedules.calendar');
 });
 
 
