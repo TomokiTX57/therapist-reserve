@@ -64,8 +64,11 @@
         </main>
     </div>
 
+    </main>
     <!-- body 閉じタグ直前 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Alpine.js CDN fallback (optional if using via Vite) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>
 
 </html>
