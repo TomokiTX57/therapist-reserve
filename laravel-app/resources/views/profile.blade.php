@@ -20,6 +20,18 @@
             Googleカレンダーと連携する
         </a>
         @endif
+        @if(Auth::user()->google_token)
+        <form action="{{ route('profile.update') }}" method="POST">
+            @csrf
+            <div class="mb-3">
+                <label for="google_event_summary" class="form-label">Googleカレンダーの予定タイトル</label>
+                <input type="text" name="google_event_summary" id="google_event_summary"
+                    class="form-control" value="{{ old('google_event_summary', Auth::user()->google_event_summary) }}">
+                <small class="form-text text-muted">例：〇〇セラピスト出勤 など</small>
+            </div>
+            <button type="submit" class="btn btn-primary">保存</button>
+        </form>
+        @endif
     </div>
 </div>
 @endsection

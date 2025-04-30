@@ -27,6 +27,7 @@ class User extends Authenticatable
         'password',
         'google_id',
         'google_token',
+        'google_event_summary',
     ];
 
     /**

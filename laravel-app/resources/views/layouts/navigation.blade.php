@@ -21,7 +21,7 @@
                     <x-nav-link :href="route('schedules.show')" :active="request()->routeIs('schedules.show')">
                         {{ __('カレンダー表示') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('profile')" :active="request()->routeIs('profile')">
+                    <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
                         {{ __('プロフィール設定') }}
                     </x-nav-link>
                 </div>

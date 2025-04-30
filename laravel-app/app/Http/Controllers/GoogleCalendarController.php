@@ -42,8 +42,10 @@ class GoogleCalendarController extends Controller
 
         $service = new Calendar($client);
 
+        $summary = $user->google_event_summary ?? '出勤スケジュール';
+
         $event = new Calendar\Event([
-            'summary' => '出勤スケジュール',
+            'summary' => $summary,
         ]);
 
         $event->setStart(new Calendar\EventDateTime([
@@ -88,7 +90,7 @@ class GoogleCalendarController extends Controller
         $service = new Calendar($client);
 
         $event = $service->events->get('primary', $schedule->google_event_id);
-        $event->setSummary('出勤スケジュール');
+        $event->setSummary($user->google_event_summary ?? '出勤スケジュール');
         $event->setStart(new Calendar\EventDateTime([
             'dateTime' => \Carbon\Carbon::parse("{$schedule->work_date} {$schedule->start_time}")->toRfc3339String()
         ]));

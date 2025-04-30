@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\ProfileController;
 
 
 
@@ -35,6 +36,8 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware('auth')->get('/profile', function () {
         return view('profile');
     })->name('profile');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
 
