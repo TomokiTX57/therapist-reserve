@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\GoogleController;
 
 
 
@@ -28,7 +29,14 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('schedules', ScheduleController::class)->only(['index', 'store', 'edit', 'update', 'destroy']);
     Route::get('schedules/export', [ScheduleController::class, 'export'])->name('schedules.export');
     Route::get('schedules/calendar', [ScheduleController::class, 'showCalendar'])->name('schedules.calendar');
+    Route::get('schedules/show', [ScheduleController::class, 'showCalendar'])->name('schedules.show');
+    Route::get('/login/google', [GoogleController::class, 'redirectToGoogle'])->name('login.google');
+    Route::get('/login/google/callback', [GoogleController::class, 'handleGoogleCallback']);
+    Route::middleware('auth')->get('/profile', function () {
+        return view('profile');
+    })->name('profile');
 });
+
 
 
 

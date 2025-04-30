@@ -81,7 +81,8 @@ $header = 'スケジュール編集';
         </div>
 
         <div class="mb-3 form-check">
-            <input type="checkbox" name="is_public" id="is_public" class="form-check-input" {{ old('is_public', $schedule->is_public) ? 'checked' : '' }}>
+            <input type="checkbox" name="is_public" id="is_public" class="form-check-input"
+                {{ old('is_public', $schedule->is_public) ? 'checked' : '' }} value="1">
             <label for="is_public" class="form-check-label">公開する</label>
         </div>
 

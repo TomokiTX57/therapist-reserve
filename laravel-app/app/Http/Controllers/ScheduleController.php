@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Schedule;
 use Illuminate\Support\Facades\Response;
+use Google\Client;
+use Google\Service\Calendar;
+use App\Models\User;
+
 
 class ScheduleController extends Controller
 {
@@ -13,6 +17,7 @@ class ScheduleController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
+
         $schedules = $user->schedules()->orderBy('work_date')->get();
         return view('schedules.index', compact('schedules'));
     }
@@ -55,12 +60,18 @@ class ScheduleController extends Controller
             return back()->withErrors(['start_time' => 'この時間帯はすでに登録されています。'])->withInput();
         }
 
-        $user->schedules()->create([
+        $schedule = $user->schedules()->create([
             'work_date' => $work_date,
             'start_time' => $start_time,
             'end_time' => $end_time,
             'is_public' => $request->has('is_public'),
         ]);
+
+        // Googleカレンダー　API連携
+        if ($user->hasGoogleCalendarToken()) {
+            app(\App\Http\Controllers\GoogleCalendarController::class)->createEvent($schedule);
+        }
+
 
         return redirect()->route('schedules.index')->with('success', 'スケジュールを登録しました。');
     }
@@ -77,13 +88,14 @@ class ScheduleController extends Controller
 
     public function update(Request $request, Schedule $schedule)
     {
+        $user = auth()->user();
         $validated = $request->validate([
             'work_date' => 'required|date',
             'start_hour' => 'required',
             'start_minute' => 'required',
             'end_hour' => 'required',
             'end_minute' => 'required',
-            'is_public' => 'nullable|boolean'
+            'is_public' => 'sometimes|boolean'
         ]);
 
         $start_time = sprintf('%02d:%02d:00', $request->start_hour, $request->start_minute);
@@ -101,12 +113,19 @@ class ScheduleController extends Controller
             'is_public' => $request->has('is_public'),
         ]);
 
+        if ($user->hasGoogleCalendarToken()) {
+            app(GoogleCalendarController::class)->updateEvent($schedule);
+        }
+
         return redirect()->route('schedules.index')->with('success', 'スケジュールを更新しました。');
     }
 
     public function destroy($id)
     {
         $schedule = auth()->user()->schedules()->findOrFail($id);
+        if (auth()->user()->hasGoogleCalendarToken()) {
+            app(\App\Http\Controllers\GoogleCalendarController::class)->deleteEvent($schedule);
+        }
         $schedule->delete();
 
         return redirect()->route('schedules.index')->with('success', 'スケジュールを削除しました。');

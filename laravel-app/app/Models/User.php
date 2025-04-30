@@ -25,6 +25,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'google_id',
+        'google_token',
     ];
 
     /**
@@ -49,5 +51,14 @@ class User extends Authenticatable
     public function schedules(): HasMany
     {
         return $this->hasMany(Schedule::class);
+    }
+    /**
+     * Determine if the user has a Google Calendar token.
+     *
+     * @return bool
+     */
+    public function hasGoogleCalendarToken(): bool
+    {
+        return !empty($this->google_token);
     }
 }
